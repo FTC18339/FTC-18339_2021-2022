@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;*/
 
+import static java.lang.Math.abs;
+
 public class Algorithms {
 
     public static final float mmPerInch = 25.4f;
@@ -68,12 +70,12 @@ public class Algorithms {
             if(i == 1 || i == 4)
             {
                 if(theta < 1 / 4) {
-                    movePower = 1;
+                    movePower = -1;
                 } else if(theta <= 3 / 4) {
                     movePower = 1;
                 } else if(theta < 5 / 4) {
                     movePower = -1;
-                } else if(theta <= 7 / 8) {
+                } else if(theta <= 7 / 4) {
                     movePower = -1;
                 } else {
                     movePower = 1;
@@ -86,7 +88,7 @@ public class Algorithms {
                     movePower = 1;
                 } else if(theta < 5 / 4) {
                     movePower = 1;
-                } else if(theta <= 7 / 8) {
+                } else if(theta <= 7 / 4) {
                     movePower = -1;
                 } else {
                     movePower = -1;
@@ -97,12 +99,12 @@ public class Algorithms {
         //z is just the magnitude of stick move
         movePower *= z;
 
-        double rZ = Math.abs(x2);
+        double rZ = abs(x2);
 
         //something up with rotation, what likely will need to do is control each wheel seperately
         double rotationPower = 0;
         if(x2 != 0) {
-            if(i == 1 || i == 2) {
+            if(i == 1 || i == 3) {
                 if(x2 < 0) {
                     rotationPower = -1;
                 } else if(x2 > 0) {
@@ -110,7 +112,7 @@ public class Algorithms {
                 } else {
                     rotationPower = 0;
                 }
-            } else if (i == 3 || i == 4) {
+            } else if (i == 2 || i == 4) {
                 if(x2 < 0) {
                     rotationPower = 1;
                 } else if(x2 > 0) {
@@ -144,13 +146,14 @@ public class Algorithms {
      */
     public double Theta(double x, double y, int q)
     {
+        angleAdder = 0;
         double iAngle = (Math.PI * q / 2 + angleAdder);
 
         if(x == 0) {
             return iAngle / Math.PI;
         } else {
-            double div = y / x;
-            double angle = Math.tanh(Math.abs(div)) + iAngle;
+            double div = abs(y) / abs(x);
+            double angle = Math.atan(abs(div)) + iAngle;
 
             if(angle >= 2 * Math.PI) {
                 angle %= 2 * Math.PI;

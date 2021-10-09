@@ -59,15 +59,15 @@ public class FTC_18339_ManualProtocol001 extends Main {
 
         if(gamepad1.y) math.SetMultiplier(0.3f);
         if(gamepad1.b) math.SetMultiplier(0.1f);
-        if(gamepad1.left_stick_button) math.SetDirection((float)Math.PI * 3 / 2);
-        if(gamepad1.right_stick_button) math.SetDirection((float)Math.PI / 2);
-        if(gamepad1.left_stick_button) dir = 1;
-        if(gamepad1.right_stick_button) dir = -1;
+        //if(gamepad1.left_stick_button) math.SetDirection((float)Math.PI * 3 / 2);
+        //if(gamepad1.right_stick_button) math.SetDirection((float)Math.PI / 2);
+        //if(gamepad1.left_stick_button) dir = 1;
+        //if(gamepad1.right_stick_button) dir = -1;
         double time = System.currentTimeMillis();
 
         //Algorithm determined wheel forces with the inputs
         double x = gamepad1.left_stick_x;
-        double y = gamepad1.left_stick_y;
+        double y = -gamepad1.left_stick_y;
 
         //Right trigger right rotation
         //Right trigger is right rotation, left trigger is left. Can slow rotations by depressing trigger less.
