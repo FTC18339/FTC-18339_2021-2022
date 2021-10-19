@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.vuforia.HINT;
@@ -31,13 +32,8 @@ public class Main extends LinearOpMode {
     public DcMotorEx right_front;
     public DcMotorEx left_back;
     public DcMotorEx left_front;
-    public DcMotor roller;
-    public DcMotorEx shooter;
-    public DcMotorEx arm;
-    public DcMotor conveyor;
 
-    public Servo hand;
-    public Servo hand2;
+    public CRServo spinner;
 
     public ColorSensor colorSensor;
     float hsvValues[] = {0F, 0F, 0F};
@@ -68,7 +64,7 @@ public class Main extends LinearOpMode {
 
     public TFObjectDetector tfod;
 
-    public Algorithms math;
+    public Algorithms001 math;
 
     public List<VuforiaTrackable> allTrackables;
 
@@ -86,7 +82,7 @@ public class Main extends LinearOpMode {
     public void initMaths() {
 
         //Initialize the maths program
-        math = new Algorithms();
+        math = new Algorithms001();
     }
 
     public void initVuforia() {
@@ -186,14 +182,8 @@ public class Main extends LinearOpMode {
         right_front = hardwareMap.get(DcMotorEx.class, "right_front");
         left_back = hardwareMap.get(DcMotorEx.class, "left_back");
         left_front = hardwareMap.get(DcMotorEx.class, "left_front");
-        //arm = hardwareMap.get(DcMotorEx.class, "arm");
-        //roller = hardwareMap.get(DcMotor.class, "roller");
-        //shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        //hand = hardwareMap.get(Servo.class, "hand");
-        //hand2 = hardwareMap.get(Servo.class, "hand2");
-        //conveyor = hardwareMap.get(DcMotor.class, "conveyor");
-        //touch = hardwareMap.get(TouchSensor.class, "touch_sensor");
-        //colorSensor = hardwareMap.get(ColorSensor.class, "color_sensor");
+        spinner = hardwareMap.get(CRServo.class, "spinner");
+
 
         // Set the functions of the motors.
         SetAutonomousDirection();
@@ -201,41 +191,30 @@ public class Main extends LinearOpMode {
         right_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //roller.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        //shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        //conveyor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     //Control Direction of wheels
     public void SetAutonomousDirection() {
         right_back.setDirection(DcMotorSimple.Direction.FORWARD);
-        right_front.setDirection(DcMotorSimple.Direction.REVERSE);
+        right_front.setDirection(DcMotorSimple.Direction.FORWARD);
         left_back.setDirection(DcMotorSimple.Direction.FORWARD);
-        left_front.setDirection(DcMotorSimple.Direction.REVERSE);
+        left_front.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void initManualModes() {
         resetMotorsAutonomous();
-        //arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //conveyor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        //roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void initAutonomousModes() {
         resetMotorsAutonomous();
-        //arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //conveyor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void StopMotors() {
@@ -246,16 +225,10 @@ public class Main extends LinearOpMode {
     }
 
     public void resetMotorsAutonomous() {
-        //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-    public void RunToPositionArmAutonomous() {
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void RunToPositionAutonomousMovement() {
@@ -301,12 +274,8 @@ public class Main extends LinearOpMode {
 
     public boolean NoNullHardware() { return (left_back != null && left_front != null && right_back != null && right_front != null); }
 
-    public boolean NoNullIntake() { return (roller != null && conveyor != null); }
+    public boolean NoNullSpinner() {return spinner != null;}
 
     public boolean NoNullSensors() { return (colorSensor != null && touch != null); }
-
-    public boolean NoNullArmature() { return (arm != null && hand != null); }
-
-    public boolean NoNullShooter() { return (shooter != null); }
 }
 

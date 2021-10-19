@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;*/
 
 import static java.lang.Math.abs;
 
-public class Algorithms {
+public class Algorithms001 {
 
     public static final float mmPerInch = 25.4f;
     public static final float mmTargetHeight = 6 * mmPerInch;
@@ -69,29 +69,33 @@ public class Algorithms {
         {
             if(i == 1 || i == 4)
             {
-                if(theta < 1 / 4) {
-                    movePower = -1;
-                } else if(theta <= 3 / 4) {
-                    movePower = 1;
-                } else if(theta < 5 / 4) {
-                    movePower = -1;
-                } else if(theta <= 7 / 4) {
-                    movePower = -1;
-                } else {
-                    movePower = 1;
+                if(Math.abs(x) > 0) {
+                    if(Math.abs(x) > Math.abs(y)) {
+                        double t = TrueSign(x);
+                        movePower = t;
+                    } else {
+                        //If y is positive returns 1, if y is negative returns -1, if y is 0 returns 0
+                        double t = TrueSign(y);
+                        movePower = t;
+                    }
+                } else if(Math.abs(y) > 0) {
+                    double t = TrueSign(y);
+                    movePower = t;
                 }
             }
             if(i == 2 || i == 3) {
-                if(theta < 1 / 4) {
-                    movePower = -1;
-                } else if(theta <= 3 / 4) {
-                    movePower = 1;
-                } else if(theta < 5 / 4) {
-                    movePower = 1;
-                } else if(theta <= 7 / 4) {
-                    movePower = -1;
-                } else {
-                    movePower = -1;
+                if(Math.abs(x) > 0) {
+                    if(Math.abs(x) > Math.abs(y)) {
+                        double t = TrueSign(x);
+                        movePower = -t;
+                    } else {
+                        //If y is positive returns 1, if y is negative returns -1, if y is 0 returns 0
+                        double t = TrueSign(y);
+                        movePower = t;
+                    }
+                } else if(Math.abs(y) > 0) {
+                    double t = TrueSign(y);
+                    movePower = t;
                 }
             }
         }
@@ -136,7 +140,7 @@ public class Algorithms {
 
         //power *= 0.5f;
 
-        return power * controlMultiplier;
+        return power;
     }
 
     //Manipulate values in here in force matrix
@@ -252,12 +256,7 @@ public class Algorithms {
             return 0;
     }
 
-    float[] valsCycle = new float[] {0.5f, 1.0f};
-    int valLen = 0;
     public void SetMultiplier(float x) {
-        valLen++;
-
-        int adjIndex = valLen % 2;
         controlMultiplier = x;
     }
 
