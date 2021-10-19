@@ -93,6 +93,7 @@ public class FTC_18339_TankProtocol001 extends Main {
         boolean x = gamepad1.x;
 
         if(x) {
+            telemetry.addData("x","x is active");
             spinner.setPower(1);
         } else {
             spinner.setPower(0);
