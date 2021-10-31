@@ -32,6 +32,10 @@ public class Main extends LinearOpMode {
     public DcMotorEx right_front;
     public DcMotorEx left_back;
     public DcMotorEx left_front;
+    public DcMotorEx arm;
+
+    public Servo hand;
+    public Servo hand2;
 
     public CRServo spinner;
 
