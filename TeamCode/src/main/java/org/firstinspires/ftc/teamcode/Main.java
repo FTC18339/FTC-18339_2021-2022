@@ -34,8 +34,10 @@ public class Main extends LinearOpMode {
     public DcMotorEx left_front;
     public DcMotorEx arm;
 
+    public CRServo arm_rotator;
+    public CRServo base_arm_joint;
+    public CRServo second_arm_joint;
     public Servo hand;
-    public Servo hand2;
 
     public CRServo spinner;
 
@@ -187,7 +189,10 @@ public class Main extends LinearOpMode {
         left_back = hardwareMap.get(DcMotorEx.class, "left_back");
         left_front = hardwareMap.get(DcMotorEx.class, "left_front");
         spinner = hardwareMap.get(CRServo.class, "spinner");
-
+        arm_rotator = hardwareMap.get(CRServo.class, "arm_rotator");
+        base_arm_joint = hardwareMap.get(CRServo.class, "base_arm_joint");
+        second_arm_joint = hardwareMap.get(CRServo.class, "second_arm_joint");
+        hand = hardwareMap.get(Servo.class, "hand");
 
         // Set the functions of the motors.
         SetAutonomousDirection();
