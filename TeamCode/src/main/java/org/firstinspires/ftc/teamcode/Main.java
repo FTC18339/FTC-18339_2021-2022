@@ -34,7 +34,7 @@ public class Main extends LinearOpMode {
     public DcMotorEx left_front;
     public DcMotorEx arm;
 
-    public CRServo arm_rotator;
+    public DcMotorEx arm_rotator;
     public CRServo base_arm_joint;
     public CRServo second_arm_joint;
     public Servo hand;
@@ -189,10 +189,10 @@ public class Main extends LinearOpMode {
         left_back = hardwareMap.get(DcMotorEx.class, "left_back");
         left_front = hardwareMap.get(DcMotorEx.class, "left_front");
         spinner = hardwareMap.get(CRServo.class, "spinner");
-        arm_rotator = hardwareMap.get(CRServo.class, "arm_rotator");
-        base_arm_joint = hardwareMap.get(CRServo.class, "base_arm_joint");
-        second_arm_joint = hardwareMap.get(CRServo.class, "second_arm_joint");
-        hand = hardwareMap.get(Servo.class, "hand");
+        arm_rotator = hardwareMap.get(DcMotorEx.class, "arm_rotator");
+        //base_arm_joint = hardwareMap.get(CRServo.class, "base_arm_joint");
+        //second_arm_joint = hardwareMap.get(CRServo.class, "second_arm_joint");
+        //hand = hardwareMap.get(Servo.class, "hand");
 
         // Set the functions of the motors.
         SetAutonomousDirection();
@@ -200,6 +200,7 @@ public class Main extends LinearOpMode {
         right_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm_rotator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     //Control Direction of wheels
@@ -216,6 +217,7 @@ public class Main extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void initAutonomousModes() {
@@ -224,6 +226,7 @@ public class Main extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void StopMotors() {
@@ -238,6 +241,7 @@ public class Main extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //arm_rotator.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void RunToPositionAutonomousMovement() {

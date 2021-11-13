@@ -17,7 +17,7 @@ public class Algorithms001 {
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
 
-    float controlMultiplier = 0.1f;
+    float controlMultiplier = 0.5f;
 
     public static final float wheelCircumferenceMm = 301.59f;
     public static final float rotationPerOneRevolution = 2.314f;

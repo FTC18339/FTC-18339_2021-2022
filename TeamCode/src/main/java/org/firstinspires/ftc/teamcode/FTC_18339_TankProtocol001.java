@@ -10,11 +10,6 @@ public class FTC_18339_TankProtocol001 extends Main {
     private double right_front_power = 0;
     private double right_back_power = 0;
 
-    private double rollerTime = 0f;
-    private double conveyorTime = 0f;
-
-    private double rollerMultiplier = 0.5f;
-    private double otherSpeedMultiplier = 1f;
     private double moveMultiplier = 1f;
 
     int dir = 1;
@@ -104,15 +99,18 @@ public class FTC_18339_TankProtocol001 extends Main {
         }
     }
 
+    float craneRotationSpeedMultiplier = 0.15f;
     public void SetCraneForces()
     {
         //Rotation of the entire arm itself, right trigger is right rotation, left trigger is left
-        double r = gamepad2.right_trigger - gamepad2.left_trigger;
+        //double r = gamepad2.right_trigger - gamepad2.left_trigger;
+        double r = gamepad1.right_stick_x * craneRotationSpeedMultiplier;
         //Rotation of the first arm joint at the base of the arm.
         double r1 = gamepad2.left_stick_y;
         //Rotation of the second arm joint.
         double r2 = gamepad2.right_stick_y;
 
-        
+        arm_rotator.setPower(r);
+        //second_arm_joint.setPower(r2);
     }
 }
