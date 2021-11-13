@@ -16,8 +16,13 @@ public class Algorithms001 {
 
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
-    
-    //Default control multiplier is 0.2, increase to make the robot faster, decrease to make the robot slower.
+
+    //--------------------------------------------------------------------------------//
+    //                                                                                //
+    // Below line critical for robot speed. Default controlMultiplier is 0.2f;        //
+    // increase only the NUMBER to make bot faster, decrease to make the bot slower.  //
+    //                                                                                //
+    //--------------------------------------------------------------------------------//
     float controlMultiplier = 0.2f;
 
     public static final float wheelCircumferenceMm = 301.59f;
