@@ -17,13 +17,7 @@ public class Algorithms001 {
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
 
-    //--------------------------------------------------------------------------------//
-    //                                                                                //
-    // Below line critical for robot speed. Default controlMultiplier is 0.2f;        //
-    // increase only the NUMBER to make bot faster, decrease to make the bot slower.  //
-    //                                                                                //
-    //--------------------------------------------------------------------------------//
-    float controlMultiplier = 0.2f;
+    float controlMultiplier = 0.05f;
 
     public static final float wheelCircumferenceMm = 301.59f;
     public static final float rotationPerOneRevolution = 2.314f;
@@ -164,15 +158,8 @@ public class Algorithms001 {
         //theta is just divided by pi so 2 is equal in angle to 2 pi
         if(y != 0)
         {
-           if(y > 0) {
-               movePower = 1;
-           } else if(y < 0) {
-               movePower = -1;
-           }
+           movePower = y;
         }
-
-        //z is just the magnitude of stick move
-        movePower *= Math.abs(y);
 
         double rZ = abs(x2);
 
