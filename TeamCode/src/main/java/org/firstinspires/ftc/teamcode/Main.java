@@ -35,8 +35,8 @@ public class Main extends LinearOpMode {
     public DcMotorEx arm;
 
     public DcMotorEx arm_rotator;
-    public CRServo base_arm_joint;
-    public CRServo second_arm_joint;
+    public Servo base_arm_joint;
+    public Servo second_arm_joint;
     public Servo hand;
 
     public CRServo spinner;
@@ -70,17 +70,21 @@ public class Main extends LinearOpMode {
 
     public TFObjectDetector tfod;
 
-    public Algorithms001 math;
+    public Algorithms002 math;
 
     public List<VuforiaTrackable> allTrackables;
 
+    //Ticks count per revolution found on motor data sheets ENCODER RESOLUTION AT GEARBOX OUTPUT SHAFT
     public final float MAX_NUM_TICKS_MOVEMENT = 537.6f;
     public final float MAX_NUM_TICKS_ARM = 5264f;
     public final float MAX_NUM_TICKS_SHOOTER = 28f;
+    public final float MAX_NUM_TICKS_ROTATOR = 383.6f;
 
+    //Our decided maximum rpm for each motor type, may not be the maximum no-load rpm, found on the motor data sheet at NO LOAD SPEED @ 12 VDC
     public final int MOVEMENT_RPM = 25;
     public final int ARM_RPM = 30;
     public final int SHOOTER_RPM = 6000;
+    public final int ROTATOR_RPM = 200;
 
     @Override
     public void runOpMode() { }
@@ -88,7 +92,8 @@ public class Main extends LinearOpMode {
     public void initMaths() {
 
         //Initialize the maths program
-        math = new Algorithms001();
+        math = new Algorithms002();
+        math.Initialize();
     }
 
     public void initVuforia() {
@@ -190,8 +195,9 @@ public class Main extends LinearOpMode {
         left_front = hardwareMap.get(DcMotorEx.class, "left_front");
         spinner = hardwareMap.get(CRServo.class, "spinner");
         arm_rotator = hardwareMap.get(DcMotorEx.class, "arm_rotator");
-        //base_arm_joint = hardwareMap.get(CRServo.class, "base_arm_joint");
-        //second_arm_joint = hardwareMap.get(CRServo.class, "second_arm_joint");
+        base_arm_joint = hardwareMap.get(Servo.class, "base_arm_joint");
+        second_arm_joint = hardwareMap.get(Servo.class, "second_arm_joint");
+        hand = hardwareMap.get(Servo.class, "hand");
         //hand = hardwareMap.get(Servo.class, "hand");
 
         // Set the functions of the motors.
@@ -201,6 +207,8 @@ public class Main extends LinearOpMode {
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm_rotator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        second_arm_joint.setDirection(Servo.Direction.REVERSE);
+        base_arm_joint.setDirection(Servo.Direction.REVERSE);
     }
 
     //Control Direction of wheels
@@ -217,6 +225,7 @@ public class Main extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
@@ -226,6 +235,7 @@ public class Main extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //arm_rotator.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 

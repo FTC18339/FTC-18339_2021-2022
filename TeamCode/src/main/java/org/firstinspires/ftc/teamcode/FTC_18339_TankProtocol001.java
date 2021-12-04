@@ -25,11 +25,21 @@ public class FTC_18339_TankProtocol001 extends Main {
 
         waitForStart();
 
+        double testX = 5 * Algorithms002.mmPerInch;
+        double testY = 0 * Algorithms002.mmPerInch;
+        double testPhi = Math.PI;
+
         //initColorSensor();
 
         if (opModeIsActive()) {
             // Loops over time to check for inputs and to update motors
             //math.SetDirection(3 / 2);
+
+            //Test IK
+            double[] qs = math.IKArm(testX, testY, testPhi);
+            base_arm_joint.setPosition(qs[0] / (2 * Math.PI));
+            second_arm_joint.setPosition(qs[1] / (2 * Math.PI));
+            hand.setPosition(qs[2] / (2 * Math.PI));
 
             while (opModeIsActive()) {
                 // Show motor info on android phone
@@ -40,6 +50,9 @@ public class FTC_18339_TankProtocol001 extends Main {
                 SetCraneForces();
 
                 //Update phone info
+                telemetry.addData("q1", qs[0]);
+                telemetry.addData("q2", qs[1]);
+                telemetry.addData("q3", qs[2]);
                 telemetry.update();
                 idle();
             }
@@ -99,18 +112,40 @@ public class FTC_18339_TankProtocol001 extends Main {
         }
     }
 
-    float craneRotationSpeedMultiplier = 0.15f;
+    float craneRotationSpeedMultiplier = 0.015f;
+    float craneArmJointOneMultiplier = 0.01f;
+    float craneArmJointTwoMultiplier = 0.006667f;
+
     public void SetCraneForces()
     {
         //Rotation of the entire arm itself, right trigger is right rotation, left trigger is left
         //double r = gamepad2.right_trigger - gamepad2.left_trigger;
-        double r = gamepad1.right_stick_x * craneRotationSpeedMultiplier;
-        //Rotation of the first arm joint at the base of the arm.
-        double r1 = gamepad2.left_stick_y;
-        //Rotation of the second arm joint.
-        double r2 = gamepad2.right_stick_y;
+        double dPadUp = 0;
+        double dPadDown = 0;
+        if(gamepad2.dpad_up) {
+            dPadUp = 1;
+        }
+        if(gamepad2.dpad_down) {
+            dPadDown = 1;
+        }
+        //number
+        float ticks = MAX_NUM_TICKS_ROTATOR;
+        //what swath of the circle can the rotator rotate to? Half of the actual angle so 45 degrees represents a quarter of the circle
+        float angleOfRotation = 45;
+        //Half of the total range, positive and negative angle of rotation
+        float rangeOfTicks = (angleOfRotation/360) * ticks;
 
-        arm_rotator.setPower(r);
-        //second_arm_joint.setPower(r2);
+
+        /*double r = (dPadUp - dPadDown) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
+        //Rotation of the first arm joint at the base of the arm.
+        double r1 = gamepad2.left_stick_y * craneArmJointOneMultiplier;
+        //Rotation of the second arm joint.
+        double r2 = gamepad2.right_stick_y * craneArmJointTwoMultiplier;
+
+        if(!(arm_rotator.getCurrentPosition() >= rangeOfTicks && r > 0) && !(arm_rotator.getCurrentPosition() <= -rangeOfTicks && r < 0)) {
+            arm_rotator.setVelocity(r);
+        }
+        base_arm_joint.setPosition(base_arm_joint.getPosition() + r1);
+        second_arm_joint.setPosition(second_arm_joint.getPosition() + r2);*/
     }
 }
