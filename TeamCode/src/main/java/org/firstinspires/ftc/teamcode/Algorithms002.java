@@ -269,8 +269,9 @@ public class Algorithms002 {
     }
 
     public final double[] rangeQ1 = new double[] {0, Math.PI};
-    public final double[] rangeQ2 = new double[] {Math.PI / 4, 7 * Math.PI / 4};
-    public final double[] rangeQ3 = new double[] {Math.PI / 4, 7 * Math.PI / 4};
+    public final double[] rangeQ2 = new double[] {Math.PI / 6, -5 * Math.PI / 6};
+    public final double q2Offset = -30;
+    public final double[] rangeQ3 = new double[] {0, Math.PI};
     double pastX = 0;
     double pastY = 0;
     public double[] IKArm(double x, double y, double phi) {
@@ -282,16 +283,16 @@ public class Algorithms002 {
         pastX = x;
         pastY = y;
 
-        //Angle of the base joint
-        double q1 = Math.atan2(y, x) - Math.atan2(lengthOfFirstArmJoint * Math.sin(currentQ2), lengthOfFirstArmJoint + lengthOfSecondArmJoint * Math.cos(currentQ2));
-        finalQ1 = Clamp(q1, rangeQ1[0], rangeQ1[1]);
-
         //Angle of the secondary elbow joint
         double q2Top = Math.pow(x,2) + Math.pow(y,2) - Math.pow(lengthOfFirstArmJoint,2) - Math.pow(lengthOfSecondArmJoint,2);
         double q2Bottom = 2 * lengthOfFirstArmJoint * lengthOfSecondArmJoint;
-        double q2 = Math.acos(q2Top / q2Bottom);
+        double q2 = -Math.acos(q2Top / q2Bottom);
         //no need to be concerned about -q2 with clamps because both will be clamped
-        finalQ2 = Clamp(q2, rangeQ2[0], rangeQ2[1]);
+        finalQ2 = Clamp(q2, rangeQ2[0], rangeQ2[1]) + q2Offset;
+
+        //Angle of the base joint
+        double q1 = Math.atan2(y, x) - Math.atan2(lengthOfFirstArmJoint * Math.sin(q2), lengthOfFirstArmJoint + lengthOfSecondArmJoint * Math.cos(q2));
+        finalQ1 = Clamp(q1, rangeQ1[0], rangeQ1[1]);
 
         //Angle of the hand joint
         double q3 = phi - q2 - q1;

@@ -198,7 +198,6 @@ public class Main extends LinearOpMode {
         base_arm_joint = hardwareMap.get(Servo.class, "base_arm_joint");
         second_arm_joint = hardwareMap.get(Servo.class, "second_arm_joint");
         hand = hardwareMap.get(Servo.class, "hand");
-        //hand = hardwareMap.get(Servo.class, "hand");
 
         // Set the functions of the motors.
         SetAutonomousDirection();
@@ -207,7 +206,7 @@ public class Main extends LinearOpMode {
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm_rotator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        second_arm_joint.setDirection(Servo.Direction.REVERSE);
+        second_arm_joint.setDirection(Servo.Direction.FORWARD);
         base_arm_joint.setDirection(Servo.Direction.REVERSE);
     }
 

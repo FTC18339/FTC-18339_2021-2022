@@ -15,6 +15,8 @@ public class FTC_18339_TankProtocol001 extends Main {
     int dir = 1;
     double adder = 0;
 
+    public double[] currentCraneCoordinates = new double[] {0,0};
+
     @Override
     public void runOpMode() {
 
@@ -27,7 +29,7 @@ public class FTC_18339_TankProtocol001 extends Main {
 
         double testX = 5 * Algorithms002.mmPerInch;
         double testY = 0 * Algorithms002.mmPerInch;
-        double testPhi = Math.PI;
+        double testPhi = 0;
 
         //initColorSensor();
 
@@ -37,9 +39,9 @@ public class FTC_18339_TankProtocol001 extends Main {
 
             //Test IK
             double[] qs = math.IKArm(testX, testY, testPhi);
-            base_arm_joint.setPosition(qs[0] / (2 * Math.PI));
-            second_arm_joint.setPosition(qs[1] / (2 * Math.PI));
-            hand.setPosition(qs[2] / (2 * Math.PI));
+            base_arm_joint.setPosition(qs[0] / (Math.PI));
+            second_arm_joint.setPosition(qs[1] / (Math.PI));
+            hand.setPosition(qs[2] / (Math.PI));
 
             while (opModeIsActive()) {
                 // Show motor info on android phone
@@ -136,7 +138,7 @@ public class FTC_18339_TankProtocol001 extends Main {
         float rangeOfTicks = (angleOfRotation/360) * ticks;
 
 
-        /*double r = (dPadUp - dPadDown) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
+        double r = (dPadUp - dPadDown) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
         //Rotation of the first arm joint at the base of the arm.
         double r1 = gamepad2.left_stick_y * craneArmJointOneMultiplier;
         //Rotation of the second arm joint.
@@ -145,7 +147,7 @@ public class FTC_18339_TankProtocol001 extends Main {
         if(!(arm_rotator.getCurrentPosition() >= rangeOfTicks && r > 0) && !(arm_rotator.getCurrentPosition() <= -rangeOfTicks && r < 0)) {
             arm_rotator.setVelocity(r);
         }
-        base_arm_joint.setPosition(base_arm_joint.getPosition() + r1);
+        /*base_arm_joint.setPosition(base_arm_joint.getPosition() + r1);
         second_arm_joint.setPosition(second_arm_joint.getPosition() + r2);*/
     }
 }
