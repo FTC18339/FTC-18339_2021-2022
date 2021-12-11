@@ -14,3 +14,6 @@ VERSION 1.02
 - Added Tank Drive
 - Removed the Unit Circle from movement calculations, switched to greater than equal calculations using absolute values to determine joystick position
 - Added Spinner servo and basic spinner servo control
+
+VERSION 1.03
+- Added Inverse Kinematics algorithm and test implementation within TANK DRIVE
