@@ -38,6 +38,8 @@ public class Main extends LinearOpMode {
     public Servo base_arm_joint;
     public Servo second_arm_joint;
     public Servo hand;
+    public Servo gripper1;
+    public Servo gripper2;
 
     public CRServo spinner;
 
@@ -78,13 +80,13 @@ public class Main extends LinearOpMode {
     public final float MAX_NUM_TICKS_MOVEMENT = 537.6f;
     public final float MAX_NUM_TICKS_ARM = 5264f;
     public final float MAX_NUM_TICKS_SHOOTER = 28f;
-    public final float MAX_NUM_TICKS_ROTATOR = 383.6f;
+    public final float MAX_NUM_TICKS_ROTATOR = 1425.2f;
 
     //Our decided maximum rpm for each motor type, may not be the maximum no-load rpm, found on the motor data sheet at NO LOAD SPEED @ 12 VDC
     public final int MOVEMENT_RPM = 25;
     public final int ARM_RPM = 30;
     public final int SHOOTER_RPM = 6000;
-    public final int ROTATOR_RPM = 200;
+    public final int ROTATOR_RPM = 100;
 
     @Override
     public void runOpMode() { }
@@ -198,6 +200,8 @@ public class Main extends LinearOpMode {
         base_arm_joint = hardwareMap.get(Servo.class, "base_arm_joint");
         second_arm_joint = hardwareMap.get(Servo.class, "second_arm_joint");
         hand = hardwareMap.get(Servo.class, "hand");
+        gripper1 = hardwareMap.get(Servo.class, "gripper1");
+        gripper2 = hardwareMap.get(Servo.class, "gripper2");
 
         // Set the functions of the motors.
         SetAutonomousDirection();
@@ -206,8 +210,8 @@ public class Main extends LinearOpMode {
         left_back.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm_rotator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        second_arm_joint.setDirection(Servo.Direction.FORWARD);
-        base_arm_joint.setDirection(Servo.Direction.REVERSE);
+        second_arm_joint.setDirection(Servo.Direction.REVERSE);
+        base_arm_joint.setDirection(Servo.Direction.FORWARD);
     }
 
     //Control Direction of wheels

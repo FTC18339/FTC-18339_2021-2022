@@ -17,6 +17,8 @@ public class FTC_18339_TankProtocol001 extends Main {
 
     public double[] currentCraneCoordinates = new double[] {0,0};
 
+    public double[] groundPosition = new double[] {207.24, 164.24};
+
     @Override
     public void runOpMode() {
 
@@ -27,21 +29,17 @@ public class FTC_18339_TankProtocol001 extends Main {
 
         waitForStart();
 
-        double testX = 5 * Algorithms002.mmPerInch;
-        double testY = 0 * Algorithms002.mmPerInch;
-        double testPhi = 0;
+        double[] qs = math.IKArm(5 * Algorithms002.mmPerInch, 5 * Algorithms002.mmPerInch, Math.PI / 2);
+
+        base_arm_joint.setPosition(math.Clamp(qs[0] / Math.PI, 0, 1));
+        second_arm_joint.setPosition(math.Clamp(qs[1] / Math.PI, 0, 1));
+        hand.setPosition(math.Clamp(qs[2] / ((7/4) * Math.PI), 0, 1));
+        gripper1.setPosition(1);
+        gripper2.setPosition(0);
 
         //initColorSensor();
 
         if (opModeIsActive()) {
-            // Loops over time to check for inputs and to update motors
-            //math.SetDirection(3 / 2);
-
-            //Test IK
-            double[] qs = math.IKArm(testX, testY, testPhi);
-            base_arm_joint.setPosition(qs[0] / (Math.PI));
-            second_arm_joint.setPosition(qs[1] / (Math.PI));
-            hand.setPosition(qs[2] / (Math.PI));
 
             while (opModeIsActive()) {
                 // Show motor info on android phone
@@ -49,12 +47,34 @@ public class FTC_18339_TankProtocol001 extends Main {
                 //Runtime Loop to update hardware with input, and automation
                 SetMotorForces();
                 SetSpinnerForces();
-                SetCraneForces();
+                SetCraneIKTarget();
+                SetGripperForces();
+
+                if(gamepad2.x) {
+                    double[] qg = math.IKArm(groundPosition[0], groundPosition[1], Math.PI / 2);
+
+                    base_arm_joint.setPosition(math.Clamp(qg[0] / Math.PI, 0, 1));
+                    second_arm_joint.setPosition(math.Clamp(qg[1] / Math.PI, 0, 1));
+                    hand.setPosition(math.Clamp(qg[2] / ((7/4) * Math.PI), 0, 1));
+
+                    currentX = groundPosition[0];
+                    currentY = groundPosition[1];
+                    currentPhi = Math.PI / 2;
+                }
+
+                if(gamepad2.y) {
+                    double[] qr = math.IKArm(5 * Algorithms002.mmPerInch, 5 * Algorithms002.mmPerInch, Math.PI / 2);
+
+                    base_arm_joint.setPosition(math.Clamp(qr[0] / Math.PI, 0, 1));
+                    second_arm_joint.setPosition(math.Clamp(qr[1] / Math.PI, 0, 1));
+                    hand.setPosition(math.Clamp(qr[2] / ((7/4) * Math.PI), 0, 1));
+
+                    currentX = 5 * Algorithms002.mmPerInch;
+                    currentY = 5 * Algorithms002.mmPerInch;
+                    currentPhi = Math.PI / 2;
+                }
 
                 //Update phone info
-                telemetry.addData("q1", qs[0]);
-                telemetry.addData("q2", qs[1]);
-                telemetry.addData("q3", qs[2]);
                 telemetry.update();
                 idle();
             }
@@ -67,12 +87,6 @@ public class FTC_18339_TankProtocol001 extends Main {
     public void SetMotorForces() {
         if(!NoNullHardware()) return;
 
-        //if(gamepad1.y) math.SetMultiplier(0.3f);
-        //if(gamepad1.b) math.SetMultiplier(0.05f);
-        //if(gamepad1.left_stick_button) math.SetDirection((float)Math.PI * 3 / 2);
-        //if(gamepad1.right_stick_button) math.SetDirection((float)Math.PI / 2);
-        //if(gamepad1.left_stick_button) dir = 1;
-        //if(gamepad1.right_stick_button) dir = -1;
         double time = System.currentTimeMillis();
 
         //Algorithm determined wheel forces with the inputs
@@ -115,10 +129,69 @@ public class FTC_18339_TankProtocol001 extends Main {
     }
 
     float craneRotationSpeedMultiplier = 0.015f;
-    float craneArmJointOneMultiplier = 0.01f;
-    float craneArmJointTwoMultiplier = 0.006667f;
+    float craneArmJointMultiplier = 1.5f;
+    float craneArmOrientationMultiplier = 0.01f;
+    double currentX = 5 * Algorithms002.mmPerInch;
+    double currentY = 5 * Algorithms002.mmPerInch;
+    double currentPhi = Math.PI / 2;
+    boolean firstIK = false;
+    public void SetCraneIKTarget()
+    {
+        double x = currentX;
+        double y = currentY;
+        double phi = currentPhi;
 
-    public void SetCraneForces()
+        double orientationChange = 0;
+
+        if(gamepad2.left_bumper)
+            orientationChange -= 1;
+
+        if(gamepad2.right_bumper)
+            orientationChange += 1;
+
+        float ticks = MAX_NUM_TICKS_ROTATOR;
+        //what swath of the circle can the rotator rotate to? Half of the actual angle so 45 degrees represents a quarter of the circle
+        float angleOfRotation = 45;
+        //Half of the total range, positive and negative angle of rotation
+        float rangeOfTicks = (angleOfRotation/360) * ticks;
+        double r = (gamepad2.right_trigger - gamepad2.left_trigger) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
+        if(!(arm_rotator.getCurrentPosition() >= rangeOfTicks && r > 0) && !(arm_rotator.getCurrentPosition() <= -rangeOfTicks && r < 0)) {
+            arm_rotator.setVelocity(r);
+        }
+
+        if((gamepad2.left_stick_y == 0 && gamepad2.right_stick_y == 0 && orientationChange == 0)) return;
+
+        double xChange = -gamepad2.left_stick_y * craneArmJointMultiplier;
+        double yChange = gamepad2.right_stick_y * craneArmJointMultiplier;
+        double phiChange = orientationChange * craneArmOrientationMultiplier;
+
+        double[] target = math.IKTargetClamp(x + xChange, y + yChange);
+        phi += phiChange;
+
+        double[] qs = math.IKArm(target[0], target[1], phi);
+
+        base_arm_joint.setPosition(math.Clamp(qs[0] / Math.PI, 0, 1));
+        second_arm_joint.setPosition(math.Clamp(qs[1] / Math.PI, 0, 1));
+        hand.setPosition(math.Clamp(qs[2] / ((7/4) * Math.PI), 0, 1));
+
+        currentX = target[0];
+        currentY = target[1];
+        currentPhi = phi;
+    }
+
+    public void SetGripperForces() {
+        if(gamepad2.a) {
+            gripper1.setPosition(1);
+            gripper2.setPosition(0);
+        }
+
+        if(gamepad2.b) {
+            gripper1.setPosition(0);
+            gripper2.setPosition(1);
+        }
+    }
+
+    /*public void SetCraneForces()
     {
         //Rotation of the entire arm itself, right trigger is right rotation, left trigger is left
         //double r = gamepad2.right_trigger - gamepad2.left_trigger;
@@ -148,6 +221,6 @@ public class FTC_18339_TankProtocol001 extends Main {
             arm_rotator.setVelocity(r);
         }
         /*base_arm_joint.setPosition(base_arm_joint.getPosition() + r1);
-        second_arm_joint.setPosition(second_arm_joint.getPosition() + r2);*/
-    }
+        second_arm_joint.setPosition(second_arm_joint.getPosition() + r2);
+    }*/
 }

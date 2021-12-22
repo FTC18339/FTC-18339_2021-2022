@@ -39,11 +39,11 @@ public class FTC_18339_AutonomousProtocol001 extends Main {
 
     public void RunAutoCommand(Command command) {
         String name = command.name;
-        float data = command.data;
+        double data = command.data;
         long time = System.currentTimeMillis() + (long)(command.time * 1000);
 
         float ticksForMotors = MAX_NUM_TICKS_MOVEMENT;
-        float revs = data / Algorithms001.wheelCircumferenceMm;
+        double revs = data / Algorithms001.wheelCircumferenceMm;
 
         if(command.positional) {
             switch (name) {

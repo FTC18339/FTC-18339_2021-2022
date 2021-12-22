@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;*/
 
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 public class Algorithms002 {
@@ -19,12 +20,12 @@ public class Algorithms002 {
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
 
-    public static final float lengthOfFirstArmJoint = 4.125f * mmPerInch;
-    public static final float lengthOfSecondArmJoint = 6.0625f * mmPerInch;
+    public static final float lengthOfFirstArmJoint = 5.567f * mmPerInch;
+    public static final float lengthOfSecondArmJoint = 7.630f * mmPerInch;
 
     public static final double initialQ1 = 0;
-    public static final double initialQ2 = Math.PI;
-    public static  final double initialQ3 = Math.PI;
+    public static final double initialQ2 = 0;
+    public static final double initialQ3 = 0;
 
     public double currentQ1;
     public double currentQ2;
@@ -39,29 +40,6 @@ public class Algorithms002 {
         currentQ1 = initialQ1;
         currentQ2 = initialQ2;
         currentQ3 = initialQ3;
-    }
-
-    /*public OpenGLMatrix createMatrix(float x, float y, float z, float u, float v, float w) {
-        //Converts float[] to OpenGLMatrix.
-        OpenGLMatrix trans = OpenGLMatrix.translation(x, y, z);
-
-        if(trans != null) {
-            OpenGLMatrix o = Orientation.getRotationMatrix(AxesReference.EXTRINSIC, AxesOrder.XYX, AngleUnit.DEGREES, u, v, w);
-
-            if(o != null) {
-                OpenGLMatrix multiplied = null;
-
-                if(trans!= null)
-                    multiplied = trans.multiplied(o);
-
-                if(multiplied != null)
-                    return multiplied;
-                else
-                    return null;
-            } else
-                return null;
-        }
-        return null;
     }
 
     /*
@@ -269,37 +247,62 @@ public class Algorithms002 {
     }
 
     public final double[] rangeQ1 = new double[] {0, Math.PI};
-    public final double[] rangeQ2 = new double[] {Math.PI / 6, -5 * Math.PI / 6};
-    public final double q2Offset = -30;
-    public final double[] rangeQ3 = new double[] {0, Math.PI};
-    double pastX = 0;
-    double pastY = 0;
+    public final double[] rangeQ2 = new double[] {-5 * Math.PI / 6, 0};
+    public final double[] rangeQ3 = new double[] {-3 * Math.PI / 4, Math.PI};
+    public final double q3Offset = -Math.PI;
+    double pastX = 0, pastY = 0, pastPhi = 0;
     public double[] IKArm(double x, double y, double phi) {
         double finalQ1 = currentQ1, finalQ2 = currentQ2, finalQ3 = currentQ3;
         double[] endArray = new double[] {finalQ1, finalQ2, finalQ3};
-        if(x == pastX && y == pastY) {
+        if(x == pastX && y == pastY && phi == pastPhi) {
             return endArray;
         }
         pastX = x;
         pastY = y;
 
-        //Angle of the secondary elbow joint
+        //Angle of the secondary elbow joint needed to be found first
         double q2Top = Math.pow(x,2) + Math.pow(y,2) - Math.pow(lengthOfFirstArmJoint,2) - Math.pow(lengthOfSecondArmJoint,2);
         double q2Bottom = 2 * lengthOfFirstArmJoint * lengthOfSecondArmJoint;
         double q2 = -Math.acos(q2Top / q2Bottom);
-        //no need to be concerned about -q2 with clamps because both will be clamped
-        finalQ2 = Clamp(q2, rangeQ2[0], rangeQ2[1]) + q2Offset;
+        //no need to be concerned about +q2 with clamps because both will be clamped, need to normalize it back into 0-1 space, but
+        //the servo is reversed
+        finalQ2 = -(Clamp(q2, rangeQ2[0], rangeQ2[1]));
 
-        //Angle of the base joint
+        //Angle of the base joint needs to have q2 found
         double q1 = Math.atan2(y, x) - Math.atan2(lengthOfFirstArmJoint * Math.sin(q2), lengthOfFirstArmJoint + lengthOfSecondArmJoint * Math.cos(q2));
         finalQ1 = Clamp(q1, rangeQ1[0], rangeQ1[1]);
 
-        //Angle of the hand joint
+        //Angle of the hand joint, needs q1 and q2 to be known
         double q3 = phi - q2 - q1;
-        finalQ3 = Clamp(q3, rangeQ3[0], rangeQ3[1]);
+        finalQ3 = -(Clamp(q3, rangeQ3[0], rangeQ3[1]) + q3Offset);
 
-        endArray = new double [] {finalQ1, finalQ2, finalQ3};
-        return endArray;
+        return new double [] {finalQ1, finalQ2, finalQ3};
+    }
+
+    public double[] IKTargetClamp(double x_, double y_)
+    {
+        double x = x_;
+        double y = y_;
+
+        if(y <= 0) {
+            double xMin = lengthOfFirstArmJoint - lengthOfSecondArmJoint * cos(Math.PI / 6);
+            double xMax = lengthOfFirstArmJoint + lengthOfSecondArmJoint;
+            x = Clamp(x_, xMin, xMax);
+
+            double yMin = Math.sqrt(Math.pow(lengthOfSecondArmJoint, 2) - Math.pow(x, 2));
+            double yMax = 0;
+            y = Clamp(y_, yMin, yMax);
+        } else {
+            double xMin = -lengthOfFirstArmJoint - lengthOfSecondArmJoint;
+            double xMax = lengthOfFirstArmJoint + lengthOfSecondArmJoint;
+            x = Clamp(x_, xMin, xMax);
+
+            double yMin = 0;
+            double yMax = Math.sqrt(Math.pow(lengthOfSecondArmJoint + lengthOfFirstArmJoint, 2) - Math.pow(x, 2));
+            y = Clamp(y_, yMin, yMax);
+        }
+
+        return new double[] {x, y};
     }
 
     public void SetMultiplier(float x) {
