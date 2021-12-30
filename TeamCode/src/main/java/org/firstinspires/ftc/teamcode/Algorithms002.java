@@ -20,8 +20,10 @@ public class Algorithms002 {
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
 
-    public static final float lengthOfFirstArmJoint = 5.567f * mmPerInch;
-    public static final float lengthOfSecondArmJoint = 7.630f * mmPerInch;
+    //public static final float lengthOfFirstArmJoint = 5.567f * mmPerInch;
+    //public static final float lengthOfSecondArmJoint = 7.630f * mmPerInch;
+    public static final float lengthOfFirstArmJoint = 104.1f;
+    public static final float lengthOfSecondArmJoint = 193.4f;
 
     public static final double initialQ1 = 0;
     public static final double initialQ2 = 0;
@@ -31,7 +33,8 @@ public class Algorithms002 {
     public double currentQ2;
     public double currentQ3;
 
-    float controlMultiplier = 0.05f;
+    //Really Slow 0.05f, Regular 0.1f
+    float controlMultiplier = 0.1f;
 
     public static final float wheelCircumferenceMm = 301.59f;
     public static final float rotationPerOneRevolution = 2.314f;
@@ -203,6 +206,8 @@ public class Algorithms002 {
     Angle THETA is found by the arctan of the controller y / x. We then further divide this by PI
     to reduce further computations (i.e. PI / 2 -> 1/2)
      */
+
+    double angleAdder = 0;
     public double Theta(double x, double y, int q)
     {
         angleAdder = 0;
@@ -248,9 +253,11 @@ public class Algorithms002 {
 
     public final double[] rangeQ1 = new double[] {0, Math.PI};
     public final double[] rangeQ2 = new double[] {-5 * Math.PI / 6, 0};
-    public final double[] rangeQ3 = new double[] {-3 * Math.PI / 4, Math.PI};
-    public final double q3Offset = -Math.PI;
+    public final double[] rangeQ3 = new double[] {0, Math.PI}; //Change?? Test with servo controller
+    //public final double q3Offset = -Math.PI;
     double pastX = 0, pastY = 0, pastPhi = 0;
+
+    public double tQ1 = 0, tQ2 = 0, tQ3 = 0;
     public double[] IKArm(double x, double y, double phi) {
         double finalQ1 = currentQ1, finalQ2 = currentQ2, finalQ3 = currentQ3;
         double[] endArray = new double[] {finalQ1, finalQ2, finalQ3};
@@ -266,7 +273,7 @@ public class Algorithms002 {
         double q2 = -Math.acos(q2Top / q2Bottom);
         //no need to be concerned about +q2 with clamps because both will be clamped, need to normalize it back into 0-1 space, but
         //the servo is reversed
-        finalQ2 = -(Clamp(q2, rangeQ2[0], rangeQ2[1]));
+        finalQ2 = Math.abs(Clamp(q2, rangeQ2[0], rangeQ2[1]));
 
         //Angle of the base joint needs to have q2 found
         double q1 = Math.atan2(y, x) - Math.atan2(lengthOfFirstArmJoint * Math.sin(q2), lengthOfFirstArmJoint + lengthOfSecondArmJoint * Math.cos(q2));
@@ -274,14 +281,17 @@ public class Algorithms002 {
 
         //Angle of the hand joint, needs q1 and q2 to be known
         double q3 = phi - q2 - q1;
-        finalQ3 = -(Clamp(q3, rangeQ3[0], rangeQ3[1]) + q3Offset);
+        finalQ3 = Clamp(q3, rangeQ3[0], rangeQ3[1]);
 
+        tQ1 = q1; tQ2 = q2; tQ3 = q3;
+
+        currentQ1 = finalQ1; currentQ2 = finalQ2; currentQ3 = finalQ3;
         return new double [] {finalQ1, finalQ2, finalQ3};
     }
 
     public double[] IKTargetClamp(double x_, double y_)
     {
-        double x = x_;
+        double x;
         double y = y_;
 
         if(y <= 0) {
@@ -309,20 +319,6 @@ public class Algorithms002 {
         controlMultiplier = x;
     }
 
-    float angleAdder = 0f;
-    public void SetDirection(float _t)
-    {
-        angleAdder = _t;
-    }
-
-    public int Sign(double n) {
-        if(n >= 0) {
-            return 1;
-        } else {
-            return -1;
-        }
-    }
-
     public int TrueSign(double n) {
         if(n > 0) {
             return 1;
@@ -342,62 +338,6 @@ public class Algorithms002 {
             return value;
         }
     }
-
-    float margin = 0.5f;
-    /*public boolean isInShooterPosBlueTower(OpenGLMatrix transform) {
-        //A range (parabolic) of positions that the root can inhabit and shoot in
-        float[] data = null;
-
-        if(transform != null)
-            data = transform.getData();
-
-        if(data == null) return false;
-
-        float fiveE = quadField / 2;
-        float sevenE = quadField + quadField / 2;
-
-        float x = data[0];
-        float y = data[0];
-
-        float oneFoot = 12 * mmPerInch;
-
-        if(!(x > -quadField - (oneFoot / 4) && x < -quadField + (oneFoot / 4))) {
-            return false;
-        }
-
-        float correctYPos = ShootParabola(x - quadField);
-
-        if(!(y > -quadField - (oneFoot / 4) && y < -quadField + (oneFoot / 4))) {
-            return false;
-        }
-
-        return true;
-    }*/
-
-    public float DistanceToTargetBlue(float currentPos) {
-        return -quadField - currentPos;
-    }
-
-    float AngleToBlueShootParabola(float currentAngle) {
-        return  0;
-    }
-
-    float ShootParabola(float x) {
-        return (x*x)/100 - 1.55525f;
-    }
-
-    /*public double GetDistance(OpenGLMatrix one, OpenGLMatrix two) {
-        //Simple distance function
-
-        VectorF t1 = one.getTranslation();
-        VectorF t2 = two.getTranslation();
-        return Math.sqrt(Math.pow((t1.get(0) - t2.get(0)), 2) + Math.pow((t1.get(1) - t2.get(1)), 2));
-    }
-
-    //Display a OpenGLMatrix
-    public String formatMatrix(OpenGLMatrix matrix) {
-        return matrix.formatAsTransform();
-    }*/
 }
 
 

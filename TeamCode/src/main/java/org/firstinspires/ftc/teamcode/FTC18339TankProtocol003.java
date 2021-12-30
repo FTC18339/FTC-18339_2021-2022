@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
-public class FTC_18339_TankProtocol001 extends Main {
+public class FTC18339TankProtocol003 extends Main {
     private double left_front_power = 0;
     private double left_back_power = 0;
     private double right_front_power = 0;
@@ -29,11 +28,11 @@ public class FTC_18339_TankProtocol001 extends Main {
 
         waitForStart();
 
-        double[] qs = math.IKArm(5 * Algorithms002.mmPerInch, 5 * Algorithms002.mmPerInch, Math.PI / 2);
+        double[] qs = math.IKArm(8 * Algorithms002.mmPerInch, 8 * Algorithms002.mmPerInch, Math.PI / 2);
 
-        base_arm_joint.setPosition(math.Clamp(qs[0] / Math.PI, 0, 1));
-        second_arm_joint.setPosition(math.Clamp(qs[1] / Math.PI, 0, 1));
-        hand.setPosition(math.Clamp(qs[2] / (Math.PI + Math.toRadians(70)), 0, 1));
+        base_arm_joint.setPosition(math.Clamp(1 - (qs[0] / Math.PI), 0, 1));
+        second_arm_joint.setPosition(math.Clamp(1 - (qs[1] / Math.PI), 0, 1));
+        hand.setPosition(math.Clamp(1 - (qs[2] / Math.PI), 0, 1));
         //gripper1.setPosition(1);
 
         //initColorSensor();
@@ -47,14 +46,16 @@ public class FTC_18339_TankProtocol001 extends Main {
                 SetMotorForces();
                 SetSpinnerForces();
                 SetCraneIKTarget();
-                //SetGripperForces();
+                SetGripperForces();
+
+                telemetry.addData("q1; q2; q3", Math.toDegrees(math.tQ1) + "; " + Math.toDegrees(math.tQ2) + "; " + Math.toDegrees(math.tQ3));
 
                 if(gamepad2.x) {
                     double[] qg = math.IKArm(groundPosition[0], groundPosition[1], Math.PI / 2);
 
-                    base_arm_joint.setPosition(math.Clamp(qg[0] / Math.PI, 0, 1));
-                    second_arm_joint.setPosition(math.Clamp(qg[1] / Math.PI, 0, 1));
-                    hand.setPosition(math.Clamp(qg[2] / (Math.PI + Math.toRadians(70)), 0, 1));
+                    base_arm_joint.setPosition(math.Clamp(1 - (qg[0] / Math.PI), 0, 1));
+                    second_arm_joint.setPosition(math.Clamp(1 - (qg[1] / Math.PI), 0, 1));
+                    hand.setPosition(math.Clamp(1 - (qg[2] / Math.PI), 0, 1));
 
                     currentX = groundPosition[0];
                     currentY = groundPosition[1];
@@ -62,14 +63,14 @@ public class FTC_18339_TankProtocol001 extends Main {
                 }
 
                 if(gamepad2.y) {
-                    double[] qr = math.IKArm(5 * Algorithms002.mmPerInch, 5 * Algorithms002.mmPerInch, Math.PI / 2);
+                    double[] qr = math.IKArm(8 * Algorithms002.mmPerInch, 8 * Algorithms002.mmPerInch, Math.PI / 2);
 
-                    base_arm_joint.setPosition(math.Clamp(qr[0] / Math.PI, 0, 1));
-                    second_arm_joint.setPosition(math.Clamp(qr[1] / Math.PI, 0, 1));
-                    hand.setPosition(math.Clamp(qr[2] / (Math.PI + Math.toRadians(70)), 0, 1));
+                    base_arm_joint.setPosition(math.Clamp(1 - (qr[0] / Math.PI), 0, 1));
+                    second_arm_joint.setPosition(math.Clamp(1 - (qr[1] / Math.PI), 0, 1));
+                    hand.setPosition(math.Clamp(1 - (qr[2] / Math.PI), 0, 1));
 
-                    currentX = 5 * Algorithms002.mmPerInch;
-                    currentY = 5 * Algorithms002.mmPerInch;
+                    currentX = 8 * Algorithms002.mmPerInch;
+                    currentY = 8 * Algorithms002.mmPerInch;
                     currentPhi = Math.PI / 2;
                 }
 
@@ -127,19 +128,20 @@ public class FTC_18339_TankProtocol001 extends Main {
         }
     }
 
-    float craneRotationSpeedMultiplier = 0.005f;
+    float craneRotationSpeedMultiplier = 0.01f;
     float craneArmJointMultiplier = 1.5f;
     float craneArmOrientationMultiplier = 0.01f;
-    double currentX = 5 * Algorithms002.mmPerInch;
-    double currentY = 5 * Algorithms002.mmPerInch;
+    double currentX = 8 * Algorithms002.mmPerInch;
+    double currentY = 8 * Algorithms002.mmPerInch;
     double currentPhi = Math.PI / 2;
     boolean firstIK = false;
     boolean lastTimeLeftStickInput = false;
     boolean lastTimeRightStickInput = false;
 
-    double craneStepMM = 10;
+    double craneStepMM = 25.4;
     public void SetCraneIKTarget()
     {
+        //placeholder variables for target
         double x = currentX;
         double y = currentY;
         double phi = currentPhi;
@@ -147,6 +149,8 @@ public class FTC_18339_TankProtocol001 extends Main {
         double xChange = 0, yChange = 0, phiChange = 0;
 
         double orientationChange = 0;
+
+        telemetry.addData("gamepad2left; gamepad2right", gamepad2.left_stick_y + "; " + gamepad2.right_stick_y);
 
         if(gamepad2.left_bumper)
             orientationChange = -1;
@@ -176,6 +180,7 @@ public class FTC_18339_TankProtocol001 extends Main {
         float angleOfRotation = 45;
         //Half of the total range, positive and negative angle of rotation
         float rangeOfTicks = (angleOfRotation/360) * ticks;
+        //Set the velocity
         double r = (gamepad2.right_trigger - gamepad2.left_trigger) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
         if(!(arm_rotator.getCurrentPosition() >= rangeOfTicks && r > 0) && !(arm_rotator.getCurrentPosition() <= -rangeOfTicks && r < 0)) {
             arm_rotator.setVelocity(r);
@@ -183,17 +188,23 @@ public class FTC_18339_TankProtocol001 extends Main {
 
         if((gamepad2.left_stick_y == 0 && gamepad2.right_stick_y == 0 && orientationChange == 0)) return;
 
+        //Get the inputs for the arm
         xChange = -gamepad2.left_stick_y * craneArmJointMultiplier;
         yChange = -gamepad2.right_stick_y * craneArmJointMultiplier;
         phiChange = orientationChange * craneArmOrientationMultiplier;
 
+        //Clamp the controls
         double[] target = math.IKTargetClamp(x + xChange, y + yChange);
         phi += phiChange;
 
+        //Calculate the angles the arm must take
         double[] qs = math.IKArm(target[0], target[1], phi);
 
+        telemetry.addData("fQ1; fQ2; fQ3", Math.toDegrees(qs[0]) + "; " + Math.toDegrees(qs[1]) + "; " + Math.toDegrees(qs[2]));
+
+        //Set the Servo Positions
         base_arm_joint.setPosition(math.Clamp(1 - (qs[0] / Math.PI), 0, 1));
-        second_arm_joint.setPosition(math.Clamp(qs[1] / Math.PI, 0, 1));
+        second_arm_joint.setPosition(math.Clamp(1 - (qs[1] / Math.PI), 0, 1));
         hand.setPosition(math.Clamp(1 - (qs[2] / Math.PI), 0, 1));
 
         currentX = target[0];
@@ -210,37 +221,4 @@ public class FTC_18339_TankProtocol001 extends Main {
             gripper1.setPosition(0);
         }
     }
-
-    /*public void SetCraneForces()
-    {
-        //Rotation of the entire arm itself, right trigger is right rotation, left trigger is left
-        //double r = gamepad2.right_trigger - gamepad2.left_trigger;
-        double dPadUp = 0;
-        double dPadDown = 0;
-        if(gamepad2.dpad_up) {
-            dPadUp = 1;
-        }
-        if(gamepad2.dpad_down) {
-            dPadDown = 1;
-        }
-        //number
-        float ticks = MAX_NUM_TICKS_ROTATOR;
-        //what swath of the circle can the rotator rotate to? Half of the actual angle so 45 degrees represents a quarter of the circle
-        float angleOfRotation = 45;
-        //Half of the total range, positive and negative angle of rotation
-        float rangeOfTicks = (angleOfRotation/360) * ticks;
-
-
-        double r = (dPadUp - dPadDown) * craneRotationSpeedMultiplier * ROTATOR_RPM * ticks;
-        //Rotation of the first arm joint at the base of the arm.
-        double r1 = gamepad2.left_stick_y * craneArmJointOneMultiplier;
-        //Rotation of the second arm joint.
-        double r2 = gamepad2.right_stick_y * craneArmJointTwoMultiplier;
-
-        if(!(arm_rotator.getCurrentPosition() >= rangeOfTicks && r > 0) && !(arm_rotator.getCurrentPosition() <= -rangeOfTicks && r < 0)) {
-            arm_rotator.setVelocity(r);
-        }
-        /*base_arm_joint.setPosition(base_arm_joint.getPosition() + r1);
-        second_arm_joint.setPosition(second_arm_joint.getPosition() + r2);
-    }*/
 }

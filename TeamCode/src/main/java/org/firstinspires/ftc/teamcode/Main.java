@@ -201,7 +201,7 @@ public class Main extends LinearOpMode {
         second_arm_joint = hardwareMap.get(Servo.class, "second_arm_joint");
         hand = hardwareMap.get(Servo.class, "hand");
         gripper1 = hardwareMap.get(Servo.class, "gripper1");
-        gripper2 = hardwareMap.get(Servo.class, "gripper2");
+        //gripper2 = hardwareMap.get(Servo.class, "gripper2");
 
         // Set the functions of the motors.
         SetAutonomousDirection();

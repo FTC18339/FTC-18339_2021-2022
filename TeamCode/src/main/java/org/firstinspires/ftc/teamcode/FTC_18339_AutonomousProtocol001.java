@@ -37,6 +37,8 @@ public class FTC_18339_AutonomousProtocol001 extends Main {
         }
     }
 
+    //Experimentally tested value
+    double rotationAngleOfOneRevolution = Math.toRadians(30);
     public void RunAutoCommand(Command command) {
         String name = command.name;
         double data = command.data;
@@ -48,7 +50,9 @@ public class FTC_18339_AutonomousProtocol001 extends Main {
         if(command.positional) {
             switch (name) {
                 case "ROTATE":
-
+                    //Find the revolution the wheels must take for a certain angle, use the desired angle and divide by the roation that
+                    //one wheel revolution provides.
+                    revs = data / rotationAngleOfOneRevolution;
                     break;
             }
         }
