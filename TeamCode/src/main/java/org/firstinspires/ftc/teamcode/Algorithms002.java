@@ -20,10 +20,10 @@ public class Algorithms002 {
     public static final float halfField = 72 * mmPerInch;
     public static final float quadField = 36 * mmPerInch;
 
-    //public static final float lengthOfFirstArmJoint = 5.567f * mmPerInch;
-    //public static final float lengthOfSecondArmJoint = 7.630f * mmPerInch;
-    public static final float lengthOfFirstArmJoint = 104.1f;
-    public static final float lengthOfSecondArmJoint = 193.4f;
+    public static final float lengthOfFirstArmJoint = 5.567f * mmPerInch;
+    public static final float lengthOfSecondArmJoint = 7.630f * mmPerInch;
+    //public static final float lengthOfFirstArmJoint = 104.1f;
+    //public static final float lengthOfSecondArmJoint = 193.4f;
 
     public static final double initialQ1 = 0;
     public static final double initialQ2 = 0;
@@ -253,8 +253,8 @@ public class Algorithms002 {
 
     public final double[] rangeQ1 = new double[] {0, Math.PI};
     public final double[] rangeQ2 = new double[] {-5 * Math.PI / 6, 0};
-    public final double[] rangeQ3 = new double[] {0, Math.PI}; //Change?? Test with servo controller
-    //public final double q3Offset = -Math.PI;
+    public final double[] rangeQ3 = new double[] {-Math.PI / 2, Math.PI}; //Change?? Test with servo controller
+    public final double q3Offset = -Math.PI;
     double pastX = 0, pastY = 0, pastPhi = 0;
 
     public double tQ1 = 0, tQ2 = 0, tQ3 = 0;
@@ -281,7 +281,7 @@ public class Algorithms002 {
 
         //Angle of the hand joint, needs q1 and q2 to be known
         double q3 = phi - q2 - q1;
-        finalQ3 = Clamp(q3, rangeQ3[0], rangeQ3[1]);
+        finalQ3 = Math.abs(Clamp(q3, rangeQ3[0], rangeQ3[1]) + q3Offset);
 
         tQ1 = q1; tQ2 = q2; tQ3 = q3;
 
