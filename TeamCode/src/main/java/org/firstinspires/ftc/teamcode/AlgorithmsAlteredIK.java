@@ -8,11 +8,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;*/
 
 import static java.lang.Math.abs;
-import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 
-public class Algorithms002 {
+public class AlgorithmsAlteredIK {
 
     public static final float mmPerInch = 25.4f;
     public static final float mmTargetHeight = 6 * mmPerInch;
@@ -37,7 +35,7 @@ public class Algorithms002 {
     final public Vector3 topPosition = new Vector3(4 * mmPerInch, 9.5 * mmPerInch, Math.PI / 2);
 
     //Really Slow 0.05f, Regular 0.1f
-    float controlMultiplier = 0.2f;
+    float controlMultiplier = 0.1f;
 
     public static final float wheelCircumferenceMm = 289.03f;
     public static final float rotationPerOneRevolution = 2.314f;
@@ -63,7 +61,6 @@ public class Algorithms002 {
         }
 
         double movePower = 0;
-
 
         //FORCE MATRIX i == 1 is left_front i == 2 is right_front i == 3 is left_back i == 4 is right_back
         //Uses unit circle math look it up if you need to
@@ -204,94 +201,21 @@ public class Algorithms002 {
         return power * controlMultiplier;
     }
 
+    public double craneHeight = 1f;
+    public double baseHeight = -1;
+    public double phi = -1;
+    public double[] IKArm(double x, double h, double xChange, double yChange, double orientationChange) {
+        double q1 = 0; double q2 = 0; double q3 = 0;
 
-    /*
-    Angle THETA is found by the arctan of the controller y / x. We then further divide this by PI
-    to reduce further computations (i.e. PI / 2 -> 1/2)
-     */
+        craneHeight = Clamp(craneHeight + xChange, -1f, 0.667f);
+        baseHeight = Clamp(baseHeight + yChange, -1, 0);
+        phi = Clamp(phi + orientationChange, -1, 1);
 
-    double angleAdder = 0;
-    public double Theta(double x, double y, int q)
-    {
-        angleAdder = 0;
-        double iAngle = (Math.PI * q / 2 + angleAdder);
+        q1 = (baseHeight + 1) / 2;
+        q2 = (craneHeight + 1) / 2;
+        q3 = (phi + 1) / 2;
 
-        if(x == 0) {
-            return iAngle / Math.PI;
-        } else {
-            double div = abs(y) / abs(x);
-            double angle = Math.atan(abs(div)) + iAngle;
-
-            if(angle >= 2 * Math.PI) {
-                angle %= 2 * Math.PI;
-            }
-
-            return angle / Math.PI;
-        }
-    }
-
-    public int GetQuad(double x, double y) {
-
-        if(x == 0 && y == 0)
-            return 0;
-        else if(x > 0 && y > 0)
-            return 0;
-        else if(x < 0 && y > 0)
-            return 1;
-        else if(x < 0 && y < 0)
-            return 2;
-        else if(x > 0 && y < 0)
-            return 3;
-        else if(x > 0 && y == 0)
-            return 0;
-        else if(x == 0 && y > 0)
-            return 0;
-        else if(x < 0 && y == 0)
-            return 1;
-        else if(x == 0 && y < 0)
-            return 2;
-        else
-            return 0;
-    }
-
-    public final double[] rangeQ1 = new double[] {0, Math.PI};
-    public final double[] rangeQ2 = new double[] {-Math.PI / 2, 5 * Math.PI / 6};
-    double q2Offset = Math.PI / 2;
-    public final double[] rangeQ3 = new double[] {-Math.PI / 3, Math.PI}; //Change?? Test with servo controller
-    double q3Offset = Math.PI / 3;
-    //public final double q3Offset = -Math.PI;
-    double pastX = 0, pastY = 0, pastPhi = 0;
-
-    public double tQ1 = 0, tQ2 = 0, tQ3 = 0;
-    public double[] IKArm(double x, double y, double phi) {
-        double finalQ1 = currentQ1, finalQ2 = currentQ2, finalQ3 = currentQ3;
-        double[] endArray = new double[] {finalQ1, finalQ2, finalQ3};
-        if(x == pastX && y == pastY && phi == pastPhi) {
-            return endArray;
-        }
-        pastX = x;
-        pastY = y;
-
-        //Angle of the secondary elbow joint needed to be found first
-        double q2Top = Math.pow(x,2) + Math.pow(y,2) - Math.pow(lengthOfFirstArmJoint,2) - Math.pow(lengthOfSecondArmJoint,2);
-        double q2Bottom = 2 * lengthOfFirstArmJoint * lengthOfSecondArmJoint;
-        double q2 = -Math.acos(q2Top / q2Bottom);
-        //no need to be concerned about +q2 with clamps because both will be clamped, need to normalize it back into 0-1 space, but
-        //the servo is reversed
-        finalQ2 = ((Clamp(q2, rangeQ2[0], rangeQ2[1]) + q2Offset) / (3 * Math.PI / 2));
-
-        //Angle of the base joint needs to have q2 found
-        double q1 = Math.atan2(y, x) - Math.atan2(lengthOfFirstArmJoint * Math.sin(q2), lengthOfFirstArmJoint + lengthOfSecondArmJoint * Math.cos(q2));
-        finalQ1 = Clamp(q1, rangeQ1[0], rangeQ1[1]);
-
-        //Angle of the hand joint, needs q1 and q2 to be known
-        double q3 = phi - q2 - q1;
-        finalQ3 = 1 - ((Clamp(q3, rangeQ3[0], rangeQ3[1]) + q3Offset) / (Math.PI + Math.PI / 3));
-
-        tQ1 = q1; tQ2 = q2; tQ3 = q3;
-
-        currentQ1 = finalQ1; currentQ2 = finalQ2; currentQ3 = finalQ3;
-        return new double [] {finalQ1, finalQ2, finalQ3};
+        return new double[] {q1, q2, q3};
     }
 
     public double[] IKTargetClamp(double x_, double y_)
