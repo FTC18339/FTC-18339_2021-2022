@@ -17,3 +17,8 @@ VERSION 1.02
 
 VERSION 1.03
 - Added Inverse Kinematics algorithm and test implementation within TANK DRIVE
+
+VERSION 1.1
+- Altered IK algorithm
+- IK implementation withing autonomous
+- autonomous paths created
