@@ -212,6 +212,9 @@ public class Main002 extends LinearOpMode {
         arm_rotator.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         second_arm_joint.setDirection(Servo.Direction.FORWARD);
         base_arm_joint.setDirection(Servo.Direction.FORWARD);
+        if(!AlgorithmsAlteredIK.is35kgBaseMotor) {
+            base_arm_joint.setDirection(Servo.Direction.REVERSE);
+        }
     }
 
     //Control Direction of wheels

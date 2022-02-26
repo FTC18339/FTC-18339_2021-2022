@@ -12,6 +12,8 @@ import static java.lang.Math.cos;
 
 public class AlgorithmsAlteredIK {
 
+    public static boolean is35kgBaseMotor = false;
+
     public static final float mmPerInch = 25.4f;
     public static final float mmTargetHeight = 6 * mmPerInch;
 
@@ -214,7 +216,11 @@ public class AlgorithmsAlteredIK {
         craneHeight = Clamp(craneHeight + xChange, -1, 1);
         phi = Clamp(phi + orientationChange, -1, 1);
 
-        q1 = 0;
+        if(!is35kgBaseMotor) {
+            q1 = 0;
+        } else {
+            q1 = 0;
+        }
         q2 = (craneHeight + 1) / 2;
         q3 = (phi + 1) / 2;
 

@@ -134,6 +134,11 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
         double baseHeight = 0.2;
         double phi = 0.5;
 
+        if(!AlgorithmsAlteredIK.is35kgBaseMotor) {
+            baseHeight = -0.1;
+            phi = 0.3f;
+        }
+
         double q1 = (baseHeight + 1) / 2;
         double q2 = (craneHeight + 1) / 2;
         double q3 = (phi + 1) / 2;
@@ -161,7 +166,7 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
         base_arm_joint.setPosition(q1);
         second_arm_joint.setPosition(q2 / (3/2));
         hand.setPosition(q3 / (3/2));
-        gripper1.setPosition(0.3f);
+        gripper1.setPosition(0.55f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 2000) && opModeIsActive()) {

@@ -174,7 +174,11 @@ public class FTC18339TankProtocol004 extends Main002 {
 
 
         //Set the Servo Positions
-        base_arm_joint.setPosition(math.Clamp(1 - (qs[0] / (3 / 2)), 0, 1));
+        if(!AlgorithmsAlteredIK.is35kgBaseMotor) {
+            base_arm_joint.setPosition(math.Clamp(1 - (qs[0] / (3 / 2)), 0, 1));
+        } else {
+            base_arm_joint.setPosition(math.Clamp(qs[0], 0, 1));
+        }
         second_arm_joint.setPosition(math.Clamp(1 - (qs[1] / (3 / 2)), 0, 1));
         hand.setPosition(math.Clamp(1 - (qs[2] / (3 / 2)), 0, 1));
     }
