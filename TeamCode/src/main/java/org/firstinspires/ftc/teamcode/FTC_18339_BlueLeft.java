@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
-public class FTC_18339_BlueLeft extends FTC_18339_AutonomousProtocol003 {
+public class FTC_18339_BlueLeft extends FTC_18339_AutonomousProtocol004 {
     @Override
     public void ChildCommandInitialization(){
         commands = new Command[] {
@@ -14,7 +14,7 @@ public class FTC_18339_BlueLeft extends FTC_18339_AutonomousProtocol003 {
                 new Command("GRIPPERDROP", 0, true, 0),
                 new Command("ROTATE", Math.toRadians(-rotationC), true, 0),
                 new Command("MOVE", thirdMoveW, true, 0),
-                new Command("ROTATE", Math.toRadians(90), true, 0),
+                new Command("ROTATE", Math.toRadians(70), true, 0),
                 new Command("MOVE", fourthMoveW, true, 0),
                 new Command("IKFORSTART", 0, true, 0)
         };

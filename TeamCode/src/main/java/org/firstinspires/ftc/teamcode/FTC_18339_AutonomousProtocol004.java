@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-public class FTC_18339_AutonomousProtocol003 extends Main002 {
+public class FTC_18339_AutonomousProtocol004 extends Main002 {
 
     public Command[] commands;
     boolean runningAuto = false;
@@ -32,7 +32,7 @@ public class FTC_18339_AutonomousProtocol003 extends Main002 {
 
         waitForStart();
 
-        gripper1.setPosition(0.8f);
+        gripper1.setPosition(0.5f);
 
         if(opModeIsActive()) {
             while(opModeIsActive()) {
@@ -130,20 +130,18 @@ public class FTC_18339_AutonomousProtocol003 extends Main002 {
     }
 
     void SetIKArmForTop() {
-        //double[] qs = math.IKArm(x, y, phi);
-
-        double craneHeight = 0f;
-        double baseHeight = 0;
+        double craneHeight = -0.667;
+        double baseHeight = 0.2;
         double phi = 0.5;
 
         double q1 = (baseHeight + 1) / 2;
         double q2 = (craneHeight + 1) / 2;
         double q3 = (phi + 1) / 2;
 
-        base_arm_joint.setPosition(1 - q1);
-        second_arm_joint.setPosition(1 - (q2 / (3/2)));
+        base_arm_joint.setPosition(q1 / (3/2));
+        second_arm_joint.setPosition((q2 / (3/2)));
         hand.setPosition(q3 / (3/2));
-        gripper1.setPosition(0.8f);
+        gripper1.setPosition(0.55f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 2000) && opModeIsActive()) {
@@ -152,7 +150,7 @@ public class FTC_18339_AutonomousProtocol003 extends Main002 {
     }
 
     void SetIKArmForStart() {
-        double craneHeight = -1f;
+        double craneHeight = 1f;
         double baseHeight = 0;
         double phi = 0.5;
 
@@ -161,9 +159,9 @@ public class FTC_18339_AutonomousProtocol003 extends Main002 {
         double q3 = (phi + 1) / 2;
 
         base_arm_joint.setPosition(q1);
-        second_arm_joint.setPosition((q2 / (3/2)));
+        second_arm_joint.setPosition(q2 / (3/2));
         hand.setPosition(q3 / (3/2));
-        gripper1.setPosition(0.4f);
+        gripper1.setPosition(0.2f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 2000) && opModeIsActive()) {
@@ -172,7 +170,7 @@ public class FTC_18339_AutonomousProtocol003 extends Main002 {
     }
 
     void GripperDrop() {
-        gripper1.setPosition(0.4f);
+        gripper1.setPosition(0.2f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 300) && opModeIsActive()) {

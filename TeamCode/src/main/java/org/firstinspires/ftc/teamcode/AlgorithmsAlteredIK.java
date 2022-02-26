@@ -37,10 +37,14 @@ public class AlgorithmsAlteredIK {
     //Really Slow 0.05f, Regular 0.1f
     float controlMultiplier = 0.1f;
 
-    public static final float wheelCircumferenceMm = 289.03f;
+    final double andyMarkWheel = 4.725f * mmPerInch * Math.PI;
+    final float goBuildaWheel = 289.03f;
+    public static double wheelCircumferenceMm = 4.725f * mmPerInch * Math.PI;
     public static final float rotationPerOneRevolution = 2.314f;
 
     public void Initialize() {
+        wheelCircumferenceMm = goBuildaWheel;
+
         currentQ1 = initialQ1;
         currentQ2 = initialQ2;
         currentQ3 = initialQ3;
@@ -201,17 +205,16 @@ public class AlgorithmsAlteredIK {
         return power * controlMultiplier;
     }
 
-    public double craneHeight = 1f;
+    public double craneHeight = 1;
     public double baseHeight = -1;
     public double phi = -1;
     public double[] IKArm(double x, double h, double xChange, double yChange, double orientationChange) {
         double q1 = 0; double q2 = 0; double q3 = 0;
 
-        craneHeight = Clamp(craneHeight + xChange, -1f, 0.667f);
-        baseHeight = Clamp(baseHeight + yChange, -1, 0);
+        craneHeight = Clamp(craneHeight + xChange, -1, 1);
         phi = Clamp(phi + orientationChange, -1, 1);
 
-        q1 = (baseHeight + 1) / 2;
+        q1 = 0;
         q2 = (craneHeight + 1) / 2;
         q3 = (phi + 1) / 2;
 

@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
-public class FTC_18339_BlueRight extends FTC_18339_AutonomousProtocol003 {
+public class FTC_18339_BlueRight extends FTC_18339_AutonomousProtocol004 {
     @Override
     public void ChildCommandInitialization(){
         commands = new Command[] {

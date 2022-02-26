@@ -43,8 +43,8 @@ public class FTC18339TankProtocol004 extends Main002 {
                 // Show motor info on android phone
 
                 //Runtime Loop to update hardware with input, and automation
-                SetMotorForces();
                 SetSpinnerForces();
+                SetMotorForces();
                 SetCraneIKTarget();
                 SetGripperForces();
 
@@ -123,16 +123,11 @@ public class FTC18339TankProtocol004 extends Main002 {
     public void SetSpinnerForces() {
         if(!NoNullSpinner()) return;
 
-        //Get the inputs
-        boolean x = gamepad1.x;
-        boolean b = gamepad1.b;
-
         //Set the spinner forces
-        if(x) {
-            telemetry.addData("x","x is active");
-            spinner.setPower(-1);
-        } else if(b) {
+        if(gamepad1.x) {
             spinner.setPower(1);
+        } else if(gamepad1.b) {
+            spinner.setPower(-1);
         } else {
             spinner.setPower(0);
         }
@@ -184,16 +179,16 @@ public class FTC18339TankProtocol004 extends Main002 {
         hand.setPosition(math.Clamp(1 - (qs[2] / (3 / 2)), 0, 1));
     }
 
-    float gripperPosition = 0.4f;
+    float gripperPosition = 0.2f;
     public void SetGripperForces() {
         //close the gripper
         if(gamepad2.a) {
-            gripperPosition = 0.8f;
+            gripperPosition = 0.55f;
         }
 
         //open the gripper
         if(gamepad2.b) {
-            gripperPosition = 0.4f;
+            gripperPosition = 0.2f;
         }
 
         gripper1.setPosition(gripperPosition);

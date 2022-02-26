@@ -39,10 +39,14 @@ public class Algorithms002 {
     //Really Slow 0.05f, Regular 0.1f
     float controlMultiplier = 0.2f;
 
-    public static final float wheelCircumferenceMm = 289.03f;
+    final float andyMarkWheel = 0;
+    final float goBuildaWheel = 289.03f;
+    public static float wheelCircumferenceMm = 289.03f;
     public static final float rotationPerOneRevolution = 2.314f;
 
     public void Initialize() {
+        wheelCircumferenceMm = goBuildaWheel;
+
         currentQ1 = initialQ1;
         currentQ2 = initialQ2;
         currentQ3 = initialQ3;
