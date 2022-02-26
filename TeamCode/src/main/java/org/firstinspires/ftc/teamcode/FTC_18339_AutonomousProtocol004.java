@@ -10,8 +10,8 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
 
     //Carosel algorithm distances
     public double firstMoveC = 15 * mmPerInch; //Orig 19
-    public double secondMoveC = 11 * mmPerInch; //Orig 14
-    public double thirdMoveC = 37 * mmPerInch; //Orig 42
+    public double secondMoveC = 11 * mmPerInch - 0.5 * mmPerInch; //Orig 14
+    public double thirdMoveC = 37 * mmPerInch - 0.5 * mmPerInch; //Orig 42
     public double fourthMoveC = 19 * mmPerInch; //Orig 24
     public double rotationC = 45; //Orig 50
 
@@ -32,7 +32,7 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
 
         waitForStart();
 
-        gripper1.setPosition(0.5f);
+        gripper1.setPosition(0.55f);
 
         if(opModeIsActive()) {
             while(opModeIsActive()) {
@@ -161,7 +161,7 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
         base_arm_joint.setPosition(q1);
         second_arm_joint.setPosition(q2 / (3/2));
         hand.setPosition(q3 / (3/2));
-        gripper1.setPosition(0.2f);
+        gripper1.setPosition(0.3f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 2000) && opModeIsActive()) {
@@ -170,7 +170,7 @@ public class FTC_18339_AutonomousProtocol004 extends Main002 {
     }
 
     void GripperDrop() {
-        gripper1.setPosition(0.2f);
+        gripper1.setPosition(0.3f);
 
         long time = System.currentTimeMillis();
         while((System.currentTimeMillis() <= time + 300) && opModeIsActive()) {
